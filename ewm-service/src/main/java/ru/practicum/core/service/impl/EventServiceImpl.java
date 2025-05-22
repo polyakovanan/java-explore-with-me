@@ -3,7 +3,9 @@ package ru.practicum.core.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.client.StatsClient;
 import ru.practicum.core.exception.ConditionsNotMetException;
+import ru.practicum.core.exception.DateValidationException;
 import ru.practicum.core.exception.NotFoundException;
 import ru.practicum.core.persistance.model.Category;
 import ru.practicum.core.persistance.model.Event;
@@ -19,6 +21,8 @@ import ru.practicum.core.persistance.repository.CategoryRepository;
 import ru.practicum.core.persistance.repository.EventRepository;
 import ru.practicum.core.persistance.repository.UserRepository;
 import ru.practicum.core.service.EventService;
+import ru.practicum.core.utils.SimpleDateTimeFormatter;
+import ru.practicum.dto.StatsDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +33,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final StatsClient statsClient;
 
     @Override
     public List<EventShortDto> findByUserId(Long userId, Integer from, Integer size) {
@@ -57,10 +62,12 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public List<EventShortDto> searchCommon(EventSearchCommon search) {
-        List<Event> events = eventRepository.findCommonEventsByFilters(search);
-        events.forEach(event -> event.setViews(event.getViews() + 1));
-        eventRepository.saveAll(events);
+        if (search.getRangeEnd() != null && search.getRangeStart() != null &&
+                search.getRangeEnd().isBefore(search.getRangeStart())) {
+            throw new DateValidationException("Дата начала не должна быть позже даты окончания");
+        }
 
+        List<Event> events = eventRepository.findCommonEventsByFilters(search);
         return events.stream()
                 .map(EventMapper::toEventShortDto)
                 .toList();
@@ -70,9 +77,6 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public List<EventFullDto> searchAdmin(EventSearchAdmin search) {
         List<Event> events = eventRepository.findAdminEventsByFilters(search);
-        events.forEach(event -> event.setViews(event.getViews() + 1));
-        eventRepository.saveAll(events);
-
         return events.stream()
                 .map(EventMapper::toEventFullDto)
                 .toList();
@@ -81,15 +85,24 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto findById(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() ->new NotFoundException("Событие с id=" + eventId + " не найдено"));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Событие с id=" + eventId + " не найдено");
         }
 
-        event.setViews(event.getViews() + 1);
+        event.setViews(getViews(event.getId()));
         eventRepository.save(event);
 
         return EventMapper.toEventFullDto(event);
+    }
+
+    private Long getViews(Long id) {
+        List<StatsDto> result = statsClient.getStats("1900-01-01 00:00:00",
+                SimpleDateTimeFormatter.toString(LocalDateTime.now()),
+                List.of("/events/" + id),
+                true);
+
+        return result.isEmpty() ? 0L : result.getFirst().getHits();
     }
 
     @Override
@@ -98,7 +111,7 @@ public class EventServiceImpl implements EventService {
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new NotFoundException("Категория с id=" + newEventDto.getCategory() + " не найдена"));
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConditionsNotMetException("Дата начала события должна быть не ранее чем через 2 часа от даты создания.");
+            throw new DateValidationException("Дата начала события должна быть не ранее чем через 2 часа от даты создания.");
         }
         return EventMapper.toEventFullDto(eventRepository.save(EventMapper.newRequestToEvent(newEventDto, initiator, category)));
     }
@@ -108,7 +121,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
         LocalDateTime eventDate = eventDto.getEventDate() == null ? event.getEventDate() : eventDto.getEventDate();
         if (eventDate.isBefore(LocalDateTime.now().plusHours(1))) {
-            throw new ConditionsNotMetException("Дата начала события должна быть не ранее чем через 1 час от даты редактирования.");
+            throw new DateValidationException("Дата начала события должна быть не ранее чем через 1 час от даты редактирования.");
         }
         if (event.getState() == EventState.PUBLISHED && eventDto.getStateAction() == EventAdminStateAction.REJECT_EVENT) {
             throw new ConditionsNotMetException("Опубликованное событие нельзя отклонить.");
@@ -150,8 +163,9 @@ public class EventServiceImpl implements EventService {
 
         LocalDateTime eventDate = eventDto.getEventDate() == null ? event.getEventDate() : eventDto.getEventDate();
         if (eventDate.isBefore(LocalDateTime.now().plusHours(1))) {
-            throw new ConditionsNotMetException("Дата начала события должна быть не ранее чем через 1 час от даты редактирования.");
+            throw new DateValidationException("Дата начала события должна быть не ранее чем через 1 час от даты редактирования.");
         }
+
         if (eventDto.getCategory() != null) {
             Category category = categoryRepository.findById(eventDto.getCategory()).orElseThrow(() -> new NotFoundException("Категория с id=" + eventDto.getCategory() + " не найдена"));
             event.setCategory(category);

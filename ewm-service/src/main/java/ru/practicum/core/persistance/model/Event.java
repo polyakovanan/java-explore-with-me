@@ -23,10 +23,10 @@ public class Event {
     @ManyToOne
     Category category;
 
-    @Column(name ="confirmed_requests")
-    Long confirmedRequests;
+    @Column(name = "confirmed_requests", nullable = false)
+    Long confirmedRequests = 0L;
 
-    @Column(name ="created_on", nullable = false)
+    @Column(name = "created_on", nullable = false)
     LocalDateTime createdOn;
 
     @Column(nullable = false)
@@ -45,16 +45,16 @@ public class Event {
     Double lon;
 
     @Column(nullable = false)
-    Boolean paid;
+    Boolean paid = false;
 
-    @Column(name = "participant_limit")
-    Long participantLimit;
+    @Column(name = "participant_limit", nullable = false)
+    Long participantLimit = 0L;
 
-    @Column(name ="published_on")
+    @Column(name = "published_on")
     LocalDateTime publishedOn;
 
-    @Column(name ="request_moderation")
-    Boolean requestModeration;
+    @Column(name = "request_moderation", nullable = false)
+    Boolean requestModeration = true;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

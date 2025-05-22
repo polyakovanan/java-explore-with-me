@@ -9,7 +9,6 @@ import ru.practicum.core.persistance.model.Event;
 import ru.practicum.core.persistance.model.dto.compilation.CompilationDto;
 import ru.practicum.core.persistance.model.dto.compilation.NewCompilationDto;
 import ru.practicum.core.persistance.model.dto.compilation.UpdateCompilationRequest;
-import ru.practicum.core.persistance.model.dto.event.state.EventState;
 import ru.practicum.core.persistance.model.mapper.CompilationMapper;
 import ru.practicum.core.persistance.repository.CompilationRepository;
 import ru.practicum.core.persistance.repository.EventRepository;
@@ -44,16 +43,8 @@ public class CompilationServiceImpl implements CompilationService {
         }
 
         Set<Event> events = new HashSet<>();
-        if (!compilationDto.getEvents().isEmpty()) {
-            events = new HashSet<>(eventRepository.findAllByIdInAndState(compilationDto.getEvents().stream().toList(), EventState.PUBLISHED));
-            List<Long> eventIds = events
-                    .stream()
-                    .map(Event::getId)
-                    .toList();
-            if (events.size() != compilationDto.getEvents().size()) {
-                List<Long> eventsNotPublished = compilationDto.getEvents().stream().filter(id -> !eventIds.contains(id)).toList();
-                throw new ConditionsNotMetException("Не все события в подборке существуют или опубликованы: " + eventsNotPublished);
-            }
+        if (compilationDto.getEvents() != null && !compilationDto.getEvents().isEmpty()) {
+            events = new HashSet<>(eventRepository.findAllByIdIn(compilationDto.getEvents().stream().toList()));
         }
 
         return CompilationMapper.toCompilationDto(
@@ -76,15 +67,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (updateCompilationRequest.getEvents() != null) {
             Set<Event> events = new HashSet<>();
             if (!updateCompilationRequest.getEvents().isEmpty()) {
-                events = new HashSet<>(eventRepository.findAllByIdInAndState(updateCompilationRequest.getEvents().stream().toList(), EventState.PUBLISHED));
-                List<Long> eventIds = events
-                        .stream()
-                        .map(Event::getId)
-                        .toList();
-                if (events.size() != updateCompilationRequest.getEvents().size()) {
-                    List<Long> eventsNotPublished = updateCompilationRequest.getEvents().stream().filter(id -> !eventIds.contains(id)).toList();
-                    throw new ConditionsNotMetException("Не все события в подборке существуют или опубликованы: " + eventsNotPublished);
-                }
+                events = new HashSet<>(eventRepository.findAllByIdIn(updateCompilationRequest.getEvents().stream().toList()));
             }
             compilation.setEvents(events);
         }

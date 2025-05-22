@@ -1,6 +1,5 @@
 package ru.practicum.core.utils;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +12,13 @@ import ru.practicum.client.StatsClient;
 import ru.practicum.dto.EndpointHitDto;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Component
 @Slf4j
 public class GlobalInterceptor implements HandlerInterceptor {
 
     @Value("${EWMServiceApp.name}")
-    private String APP_NAME;
+    private String appName;
 
     private final StatsClient statsClient;
 
@@ -33,7 +31,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         try {
             ResponseEntity<Object> statsResponse = statsClient.save(EndpointHitDto.builder()
-                    .app(APP_NAME)
+                    .app(appName)
                     .uri(request.getRequestURI())
                     .ip(request.getRemoteAddr())
                     .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
@@ -41,8 +39,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
             if (!statsResponse.getStatusCode().is2xxSuccessful()) {
                 log.error("Ошибка при сохранении статистики: {}", statsResponse.getBody());
             }
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             log.error("Исключительная ситуация при сохранении статистики: {}", e.getMessage());
         }
         return true;

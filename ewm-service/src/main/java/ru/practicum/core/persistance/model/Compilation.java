@@ -20,7 +20,7 @@ public class Compilation {
     private String title;
 
     @Column(nullable = false)
-    private Boolean pinned;
+    private Boolean pinned = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "events_compilations",

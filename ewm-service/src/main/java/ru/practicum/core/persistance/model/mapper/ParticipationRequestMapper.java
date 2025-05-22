@@ -2,7 +2,6 @@ package ru.practicum.core.persistance.model.mapper;
 
 import ru.practicum.core.persistance.model.ParticipationRequest;
 import ru.practicum.core.persistance.model.dto.request.ParticipationRequestDto;
-import ru.practicum.core.persistance.model.dto.request.ParticipationRequestStatus;
 
 public class ParticipationRequestMapper {
     private ParticipationRequestMapper() {

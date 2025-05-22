@@ -1,11 +1,15 @@
 package ru.practicum.core.utils;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.core.exception.ConditionsNotMetException;
+import ru.practicum.core.exception.DateValidationException;
 import ru.practicum.core.exception.NotFoundException;
 
 import java.time.LocalDateTime;
@@ -20,7 +24,7 @@ public class ErrorHandler {
     public ApiError handleNotFound(final NotFoundException e) {
         return ApiError.builder()
                 .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .status(HttpStatus.CONFLICT.toString())
+                .status(HttpStatus.NOT_FOUND.toString())
                 .reason("Запрошенный объект не найден.")
                 .message(e.getMessage())
                 .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
@@ -47,9 +51,57 @@ public class ErrorHandler {
         String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ApiError.builder()
                 .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .status(HttpStatus.CONFLICT.toString())
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .reason("Некорректный запрос.")
                 .message("Некорректное значение параметра " + field + ": " + errorMessage)
+                .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
+                .build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleСonstraintViolationException(final ConstraintViolationException e) {
+        return ApiError.builder()
+                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .reason("Нарушены условия валидации данных.")
+                .message(e.getMessage())
+                .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
+                .build();
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMessageNotReadableException(final HttpMessageNotReadableException e) {
+        return ApiError.builder()
+                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .reason("Некорректно составлен запрос.")
+                .message(e.getMessage())
+                .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
+                .build();
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingRequestParameterException(final MissingServletRequestParameterException e) {
+        return ApiError.builder()
+                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .reason("Не передан обязательный параметр + " + e.getParameterName() + ".")
+                .message(e.getMessage())
+                .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
+                .build();
+    }
+
+    @ExceptionHandler(DateValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleDateValidationException(final DateValidationException e) {
+        return ApiError.builder()
+                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .reason("Нарушены условия валидации дат.")
+                .message(e.getMessage())
                 .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
                 .build();
     }

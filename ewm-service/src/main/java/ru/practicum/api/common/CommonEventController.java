@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,10 @@ public class CommonEventController {
     public ResponseEntity<List<EventShortDto>> findAll(@RequestParam(required = false) String text,
                                                        @RequestParam(required = false) List<Long> categories,
                                                        @RequestParam(required = false) Boolean paid,
-                                                       @RequestParam(required = false) LocalDateTime rangeStart,
-                                                       @RequestParam(required = false) LocalDateTime rangeEnd,
+                                                       @RequestParam(required = false)
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                       @RequestParam(required = false)
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                        @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                        @RequestParam(defaultValue = "EVENT_DATE") String sort,
                                                        @RequestParam(defaultValue = "0") @PositiveOrZero int from,

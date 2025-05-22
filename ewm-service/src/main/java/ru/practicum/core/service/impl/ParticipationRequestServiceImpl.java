@@ -41,7 +41,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     @Override
-    public List<ParticipationRequestDto> getAllByEventAndInitiator(Long eventId, Long userId) {
+    public List<ParticipationRequestDto> getAllByEventAndInitiator(Long userId, Long eventId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
         if (!event.getInitiator().getId().equals(userId)) {
@@ -75,7 +75,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         ParticipationRequest participationRequest = ParticipationRequest.builder()
                 .requester(requester)
                 .event(event)
-                .status(event.getRequestModeration() ? ParticipationRequestStatus.PENDING : ParticipationRequestStatus.CONFIRMED)
+                .status(event.getParticipantLimit() > 0 && event.getRequestModeration() ? ParticipationRequestStatus.PENDING : ParticipationRequestStatus.CONFIRMED)
                 .created(LocalDateTime.now())
                 .build();
         if (!event.getRequestModeration()) {
@@ -102,7 +102,9 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         event.setConfirmedRequests(event.getConfirmedRequests() - 1);
         eventRepository.save(event);
 
-        participationRequestRepository.deleteById(requestId);
+        participationRequest.setStatus(ParticipationRequestStatus.CANCELED);
+
+        participationRequestRepository.save(participationRequest);
         return ParticipationRequestMapper.toParticipationRequestDto(participationRequest);
     }
 
@@ -122,7 +124,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         List<Long> requestIds = participationRequests.stream().map(ParticipationRequest::getId).toList();
         List<Long> absentRequestIds = new ArrayList<>();
         requestDto.getRequestIds().forEach(id -> {
-            if(!requestIds.contains(id)) {
+            if (!requestIds.contains(id)) {
                 absentRequestIds.add(id);
             }
         });

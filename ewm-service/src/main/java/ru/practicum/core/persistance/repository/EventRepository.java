@@ -65,7 +65,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM events e " +
             "WHERE (:users IS NULL OR e.initiator.id IN :users) " +
-            "AND (:states IS NULL OR LOWER(e.state) IN :states) " +
+            "AND (:states IS NULL OR e.state IN :states) " +
             "AND (:categories IS NULL OR e.category.id IN :categories) " +
             "AND (:rangeStart IS NULL OR e.eventDate >= :rangeStart) " +
             "AND (:rangeEnd IS NULL OR e.eventDate <= :rangeEnd) " +
@@ -95,8 +95,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         );
     }
 
-    List<Event> findAllByIdInAndState(List<Long> ids, EventState state);
-
     @Query("SELECT e FROM events e " +
             "WHERE e.initiator.id = :user " +
             "ORDER BY e.eventDate DESC")
@@ -108,4 +106,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         }
         return findAllByInitiatorId(userId, Pageable.unpaged());
     }
+
+    List<Event> findAllByCategoryId(Long categoryId);
+
+    List<Event> findAllByIdIn(List<Long> list);
 }

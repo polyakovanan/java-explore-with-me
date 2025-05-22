@@ -28,6 +28,7 @@ public class EventMapper {
                 .location(new Location(event.getLat(), event.getLon()))
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
+                .confirmedRequests(event.getConfirmedRequests())
                 .publishedOn(event.getPublishedOn())
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState())
@@ -55,9 +56,9 @@ public class EventMapper {
                 .initiator(user)
                 .category(category)
                 .title(newEventDto.getTitle())
-                .paid(newEventDto.getPaid())
-                .requestModeration(newEventDto.getRequestModeration())
-                .participantLimit(newEventDto.getParticipantLimit())
+                .paid(newEventDto.getPaid() != null && newEventDto.getPaid())
+                .requestModeration(newEventDto.getRequestModeration() == null || newEventDto.getRequestModeration())
+                .participantLimit(newEventDto.getParticipantLimit() == null ? 0 : newEventDto.getParticipantLimit())
                 .lon(newEventDto.getLocation().getLon())
                 .lat(newEventDto.getLocation().getLat())
                 .annotation(newEventDto.getAnnotation())
@@ -67,7 +68,6 @@ public class EventMapper {
                 .state(EventState.PENDING)
                 .confirmedRequests(0L)
                 .views(0L)
-                .publishedOn(null)
                 .build();
     }
 }

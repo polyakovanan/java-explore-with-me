@@ -66,7 +66,7 @@ public class SecuredEventController {
 
     }
 
-    @PatchMapping("/{eventId}/request")
+    @PatchMapping("/{eventId}/requests")
     public ResponseEntity<EventRequestStatusUpdateResult> updateRequest(@PathVariable Long userId,
                                                                         @PathVariable Long eventId,
                                                                         @RequestBody @Valid EventRequestStatusUpdateRequest eventDto) {

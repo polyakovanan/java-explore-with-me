@@ -10,6 +10,7 @@ public class UserMapper {
     private UserMapper() {
 
     }
+
     public static User requestToUser(NewUserRequest userRequest) {
         return User.builder()
                 .name(userRequest.getName())

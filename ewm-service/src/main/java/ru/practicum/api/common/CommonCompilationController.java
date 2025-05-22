@@ -17,6 +17,7 @@ import java.util.List;
 @Validated
 public class CommonCompilationController {
     private final CompilationService compilationService;
+
     @GetMapping
     public ResponseEntity<List<CompilationDto>> findAll(@RequestParam(required = false) Boolean pinned,
                                                         @RequestParam(defaultValue = "0") Integer from,

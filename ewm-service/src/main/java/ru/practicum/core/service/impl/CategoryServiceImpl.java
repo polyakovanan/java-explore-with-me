@@ -9,6 +9,7 @@ import ru.practicum.core.persistance.model.dto.category.CategoryDto;
 import ru.practicum.core.persistance.model.dto.category.NewCategoryDto;
 import ru.practicum.core.persistance.model.mapper.CategoryMapper;
 import ru.practicum.core.persistance.repository.CategoryRepository;
+import ru.practicum.core.persistance.repository.EventRepository;
 import ru.practicum.core.service.CategoryService;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public List<CategoryDto> getAll(Integer from, Integer size) {
@@ -49,8 +51,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Категория с id=" + id + " не найдена")
         );
-
-        if (!categoryRepository.findByNameIgnoreCase(newCategoryDto.getName()).isEmpty()) {
+        List<Category> categories = categoryRepository.findByNameIgnoreCase(newCategoryDto.getName());
+        if (!categories.isEmpty() && !categories.getFirst().getId().equals(id)) {
             throw new ConditionsNotMetException("Категория с именем " + newCategoryDto.getName() + " уже существует");
         }
 
@@ -63,6 +65,9 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Категория с id=" + id + " не найдена")
         );
+        if (!eventRepository.findAllByCategoryId(id).isEmpty()) {
+            throw new ConditionsNotMetException("Удаление категории невозможно, так как она используется в событиях");
+        }
         categoryRepository.deleteById(id);
     }
 }

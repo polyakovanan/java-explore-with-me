@@ -31,9 +31,9 @@ public class StatsController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<List<StatsDto>> getStats(@RequestParam
+    public ResponseEntity<List<StatsDto>> getStats(@RequestParam()
                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                                   @RequestParam
+                                                   @RequestParam()
                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
                                                    @RequestParam(required = false) List<String> uris,
                                                    @RequestParam(defaultValue = "false") Boolean unique) {
