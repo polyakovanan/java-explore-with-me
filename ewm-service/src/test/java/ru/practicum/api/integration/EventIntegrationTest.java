@@ -66,7 +66,7 @@ class EventIntegrationTest {
         eventRepository.deleteAll();
         categoryRepository.deleteAll();
         userRepository.deleteAll();
-        
+
         initiator = userRepository.save(User.builder()
                 .name("Initiator")
                 .email("initiator@example.com")
@@ -165,7 +165,7 @@ class EventIntegrationTest {
     void getPublishedEventsThroughCommonEndpointShouldReturnOnlyPublished() throws Exception {
         event.setState(EventState.PUBLISHED);
         eventRepository.save(event);
-        
+
         eventRepository.save(Event.builder()
                 .title("Test Event")
                 .annotation("Test Annotation")
