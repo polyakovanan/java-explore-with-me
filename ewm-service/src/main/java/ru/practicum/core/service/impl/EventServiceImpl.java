@@ -98,7 +98,7 @@ public class EventServiceImpl implements EventService {
 
     private Long getViews(Long id) {
         List<StatsDto> result = statsClient.getStats("1900-01-01 00:00:00",
-                SimpleDateTimeFormatter.toString(LocalDateTime.now()),
+                SimpleDateTimeFormatter.toString(LocalDateTime.now().plusMinutes(2)),
                 List.of("/events/" + id),
                 true);
 
