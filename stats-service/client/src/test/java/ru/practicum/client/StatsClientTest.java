@@ -82,7 +82,7 @@ class StatsClientTest {
                 eq(HttpMethod.GET),
                 argThat(this::checkHeaders),
                 eq(Object.class),
-                eq(Map.of("start", start, "end", end, "uris", uris, "unique", unique)))
+                eq(Map.of("start", start, "end", end, "uris", String.join(",", List.of("/test1", "/test2")), "unique", unique)))
         ).thenReturn(expectedResponse);
 
         List<StatsDto> actualResponse = statsClient.getStats(start, end, uris, unique);
@@ -93,7 +93,7 @@ class StatsClientTest {
                 eq(HttpMethod.GET),
                 argThat(this::checkHeaders),
                 eq(Object.class),
-                eq(Map.of("start", start, "end", end, "uris", uris, "unique", unique)));
+                eq(Map.of("start", start, "end", end, "uris", String.join(",", List.of("/test1", "/test2")), "unique", unique)));
     }
 
     @Test
@@ -109,7 +109,7 @@ class StatsClientTest {
                 eq(HttpMethod.GET),
                 argThat(this::checkHeaders),
                 eq(Object.class),
-                eq(Map.of("start", start, "end", end, "uris", uris, "unique", unique)))
+                eq(Map.of("start", start, "end", end, "uris", String.join(",", List.of()), "unique", unique)))
         ).thenReturn(expectedResponse);
 
         List<StatsDto> actualResponse = statsClient.getStats(start, end, uris, unique);
@@ -120,7 +120,7 @@ class StatsClientTest {
                 eq(HttpMethod.GET),
                 argThat(this::checkHeaders),
                 eq(Object.class),
-                eq(Map.of("start", start, "end", end, "uris", uris, "unique", unique)));
+                eq(Map.of("start", start, "end", end, "uris", String.join(",", List.of()), "unique", unique)));
     }
 
     @Test
@@ -139,7 +139,7 @@ class StatsClientTest {
                 eq(HttpMethod.GET),
                 argThat(this::checkHeaders),
                 eq(Object.class),
-                eq(Map.of("start", start, "end", end, "uris", uris, "unique", unique)))
+                eq(Map.of("start", start, "end", end, "uris", String.join(",", List.of("/test")), "unique", unique)))
         ).thenThrow(exception);
 
         List<StatsDto> response = statsClient.getStats(start, end, uris, unique);
