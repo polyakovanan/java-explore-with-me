@@ -53,13 +53,10 @@ class UserServiceTest {
 
     @Test
     void getAllWhenNoIdsThenReturnAllUsers() {
-        // given
         when(userRepository.findUsers(null, 0, 10)).thenReturn(List.of(user));
 
-        // when
         List<UserDto> result = userService.getAll(null, 0, 10);
 
-        // then
         assertEquals(1, result.size());
         assertEquals(userDto.getId(), result.getFirst().getId());
         assertEquals(userDto.getName(), result.getFirst().getName());
@@ -70,14 +67,11 @@ class UserServiceTest {
 
     @Test
     void getAllWhenWithIdsThenReturnFilteredUsers() {
-        // given
         List<Long> ids = List.of(1L);
         when(userRepository.findUsers(ids, 0, 10)).thenReturn(List.of(user));
 
-        // when
         List<UserDto> result = userService.getAll(ids, 0, 10);
 
-        // then
         assertEquals(1, result.size());
         assertEquals(userDto.getId(), result.getFirst().getId());
 
@@ -86,14 +80,11 @@ class UserServiceTest {
 
     @Test
     void createWhenValidRequestThenReturnCreatedUser() {
-        // given
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        // when
         UserDto result = userService.create(newUserRequest);
 
-        // then
         assertNotNull(result);
         assertEquals(userDto.getId(), result.getId());
         assertEquals(userDto.getName(), result.getName());
@@ -105,10 +96,8 @@ class UserServiceTest {
 
     @Test
     void createWhenEmailExistsThenThrowConditionsNotMetException() {
-        // given
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
 
-        // when & then
         ConditionsNotMetException exception = assertThrows(
                 ConditionsNotMetException.class,
                 () -> userService.create(newUserRequest)
@@ -121,24 +110,19 @@ class UserServiceTest {
 
     @Test
     void deleteWhenUserExistsThenDeleteUser() {
-        // given
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         doNothing().when(userRepository).deleteById(1L);
 
-        // when
         userService.delete(1L);
 
-        // then
         verify(userRepository).findById(1L);
         verify(userRepository).deleteById(1L);
     }
 
     @Test
     void deleteWhenUserNotExistsThenThrowNotFoundException() {
-        // given
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // when & then
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> userService.delete(1L)

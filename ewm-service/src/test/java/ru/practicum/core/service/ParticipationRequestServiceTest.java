@@ -230,14 +230,12 @@ class ParticipationRequestServiceTest {
 
     @Test
     void updateStatusWhenNoModerationShouldThrowConditionsNotMetException() {
-        // Arrange
         event.setRequestModeration(false);
-        event.setParticipantLimit(0L); // Важно установить лимит 0
+        event.setParticipantLimit(0L);
 
         when(userRepository.findById(2L)).thenReturn(Optional.of(initiator));
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        // Act & Assert
         ConditionsNotMetException exception = assertThrows(
                 ConditionsNotMetException.class,
                 () -> participationRequestService.updateStatus(2L, 1L, updateRequest)
@@ -249,7 +247,6 @@ class ParticipationRequestServiceTest {
 
     @Test
     void updateStatusWhenLimitReachedShouldRejectOtherRequests() {
-        // Arrange
         event.setConfirmedRequests(9L);
         event.setParticipantLimit(10L);
 
@@ -265,12 +262,10 @@ class ParticipationRequestServiceTest {
         when(participationRequestRepository.findAllByEventId(1L))
                 .thenReturn(List.of(request, request2));
 
-        updateRequest.setRequestIds(Set.of(1L)); // Подтверждаем только 1 заявку
+        updateRequest.setRequestIds(Set.of(1L));
 
-        // Act
         EventRequestStatusUpdateResult result = participationRequestService.updateStatus(2L, 1L, updateRequest);
 
-        // Assert
         assertEquals(1, result.getConfirmedRequests().size());
         assertEquals(1, result.getRejectedRequests().size());
         assertEquals(ParticipationRequestStatus.CONFIRMED, request.getStatus());
@@ -280,14 +275,12 @@ class ParticipationRequestServiceTest {
 
     @Test
     void updateStatusWhenParticipantLimitZeroShouldThrowException() {
-        // Arrange
         event.setParticipantLimit(0L);
-        event.setRequestModeration(true); // Модерация включена, но лимит 0
+        event.setRequestModeration(true);
 
         when(userRepository.findById(2L)).thenReturn(Optional.of(initiator));
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        // Act & Assert
         ConditionsNotMetException exception = assertThrows(
                 ConditionsNotMetException.class,
                 () -> participationRequestService.updateStatus(2L, 1L, updateRequest)

@@ -58,7 +58,6 @@ class ParticipationRequestIntegrationTest {
         userRepository.deleteAll();
         categoryRepository.deleteAll();
 
-        // Создаем категорию
         category = categoryRepository.save(Category.builder()
                 .name("Test Category")
                 .build());
@@ -100,14 +99,13 @@ class ParticipationRequestIntegrationTest {
 
     @Test
     void createRequestShouldCreateAndReturnRequest() throws Exception {
-        // Создаем второе событие с категорией для теста создания заявки
         Event newEvent = eventRepository.save(Event.builder()
                 .title("New Event")
                 .annotation("New Annotation")
                 .description("New Description")
                 .eventDate(LocalDateTime.now().plusDays(2))
                 .initiator(event.getInitiator())
-                .category(category)  // Добавляем категорию
+                .category(category)
                 .state(EventState.PUBLISHED)
                 .participantLimit(5L)
                 .confirmedRequests(0L)
@@ -147,7 +145,6 @@ class ParticipationRequestIntegrationTest {
 
     @Test
     void createRequestWhenEventNotPublishedShouldReturnConflict() throws Exception {
-        // Создаем неопубликованное событие с категорией
         Event unpublishedEvent = eventRepository.save(Event.builder()
                 .title("Unpublished Event")
                 .annotation("Unpublished Annotation")

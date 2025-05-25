@@ -62,13 +62,11 @@ class EventIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Очистка всех данных перед каждым тестом
         requestRepository.deleteAll();
         eventRepository.deleteAll();
         categoryRepository.deleteAll();
         userRepository.deleteAll();
-
-        // Создание тестовых данных
+        
         initiator = userRepository.save(User.builder()
                 .name("Initiator")
                 .email("initiator@example.com")
@@ -124,7 +122,7 @@ class EventIntegrationTest {
     }
 
     @Test
-    void createEvent_throughSecuredEndpointShouldCreateAndReturnEvent() throws Exception {
+    void createEventThroughSecuredEndpointShouldCreateAndReturnEvent() throws Exception {
         mockMvc.perform(post("/users/{userId}/events", initiator.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newEventDto)))
@@ -139,7 +137,7 @@ class EventIntegrationTest {
     }
 
     @Test
-    void updateEvent_throughAdminEndpointShouldPublishEvent() throws Exception {
+    void updateEventThroughAdminEndpointShouldPublishEvent() throws Exception {
         mockMvc.perform(patch("/admin/events/{eventId}", event.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(adminUpdateRequest)))
@@ -152,7 +150,7 @@ class EventIntegrationTest {
     }
 
     @Test
-    void updateEvent_throughUserEndpointShouldUpdateEvent() throws Exception {
+    void updateEventThroughUserEndpointShouldUpdateEvent() throws Exception {
         mockMvc.perform(patch("/users/{userId}/events/{eventId}", initiator.getId(), event.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userUpdateRequest)))
@@ -164,12 +162,10 @@ class EventIntegrationTest {
     }
 
     @Test
-    void getPublishedEvents_throughCommonEndpointShouldReturnOnlyPublished() throws Exception {
-        // Публикуем событие
+    void getPublishedEventsThroughCommonEndpointShouldReturnOnlyPublished() throws Exception {
         event.setState(EventState.PUBLISHED);
         eventRepository.save(event);
-
-        // Создаем неопубликованное событие
+        
         eventRepository.save(Event.builder()
                 .title("Test Event")
                 .annotation("Test Annotation")
@@ -193,8 +189,7 @@ class EventIntegrationTest {
     }
 
     @Test
-    void getEventRequests_throughSecuredEndpointShouldReturnRequests() throws Exception {
-        // Создаем запрос на участие
+    void getEventRequestsThroughSecuredEndpointShouldReturnRequests() throws Exception {
         ParticipationRequest request = requestRepository.save(ParticipationRequest.builder()
                 .event(event)
                 .requester(participant)
@@ -209,8 +204,7 @@ class EventIntegrationTest {
     }
 
     @Test
-    void updateRequestStatus_throughSecuredEndpointShouldUpdateStatus() throws Exception {
-        // Создаем запрос на участие
+    void updateRequestStatusThroughSecuredEndpointShouldUpdateStatus() throws Exception {
         ParticipationRequest request = requestRepository.save(ParticipationRequest.builder()
                 .event(event)
                 .requester(participant)
@@ -235,7 +229,7 @@ class EventIntegrationTest {
     @Test
     void createEventWithInvalidDataShouldReturnBadRequest() throws Exception {
         NewEventDto invalidDto = NewEventDto.builder()
-                .title("Short") // Слишком короткое название
+                .title("Short")
                 .build();
 
         mockMvc.perform(post("/users/{userId}/events", initiator.getId())

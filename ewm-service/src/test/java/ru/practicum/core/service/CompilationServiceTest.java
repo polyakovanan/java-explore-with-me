@@ -77,17 +77,14 @@ class CompilationServiceTest {
 
     @Test
     void findAllShouldReturnListOfCompilations() {
-        // Arrange
         Event event = createTestEvent(1L);
         Compilation compilation = createTestCompilation(1L, "Test Compilation", true, Set.of(event));
 
         when(compilationRepository.findCompilations(any(), any(), any()))
                 .thenReturn(List.of(compilation));
 
-        // Act
         List<CompilationDto> result = compilationService.findAll(true, 0, 10);
 
-        // Assert
         assertEquals(1, result.size());
         assertEquals("Test Compilation", result.getFirst().getTitle());
         assertTrue(result.getFirst().getPinned());
@@ -96,16 +93,13 @@ class CompilationServiceTest {
 
     @Test
     void findByIdShouldReturnCompilationWhenExists() {
-        // Arrange
         Event event = createTestEvent(1L);
         Compilation compilation = createTestCompilation(1L, "Test Compilation", false, Set.of(event));
 
         when(compilationRepository.findById(1L)).thenReturn(Optional.of(compilation));
 
-        // Act
         CompilationDto result = compilationService.findById(1L);
 
-        // Assert
         assertNotNull(result);
         assertEquals("Test Compilation", result.getTitle());
         assertFalse(result.getPinned());
@@ -114,16 +108,13 @@ class CompilationServiceTest {
 
     @Test
     void findByIdShouldThrowNotFoundExceptionWhenNotExists() {
-        // Arrange
         when(compilationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NotFoundException.class, () -> compilationService.findById(1L));
     }
 
     @Test
     void createShouldSaveNewCompilation() {
-        // Arrange
         NewCompilationDto newCompilationDto = new NewCompilationDto();
         newCompilationDto.setTitle("New Compilation");
         newCompilationDto.setPinned(true);
@@ -136,10 +127,8 @@ class CompilationServiceTest {
         when(eventRepository.findAllByIdIn(any())).thenReturn(List.of(event1, event2));
         when(compilationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         CompilationDto result = compilationService.create(newCompilationDto);
 
-        // Assert
         assertNotNull(result);
         assertEquals("New Compilation", result.getTitle());
         assertTrue(result.getPinned());
@@ -148,7 +137,6 @@ class CompilationServiceTest {
 
     @Test
     void createShouldThrowExceptionWhenTitleExists() {
-        // Arrange
         NewCompilationDto newCompilationDto = new NewCompilationDto();
         newCompilationDto.setTitle("Existing Compilation");
 
@@ -156,13 +144,11 @@ class CompilationServiceTest {
 
         when(compilationRepository.findByTitleIgnoreCase("Existing Compilation")).thenReturn(List.of(existing));
 
-        // Act & Assert
         assertThrows(ConditionsNotMetException.class, () -> compilationService.create(newCompilationDto));
     }
 
     @Test
     void updateShouldUpdateCompilation() {
-        // Arrange
         Event oldEvent = createTestEvent(1L);
         Event newEvent = createTestEvent(2L);
 
@@ -179,10 +165,8 @@ class CompilationServiceTest {
         when(eventRepository.findAllByIdIn(any())).thenReturn(List.of(newEvent));
         when(compilationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         CompilationDto result = compilationService.update(1L, updateRequest);
 
-        // Assert
         assertEquals("New Title", result.getTitle());
         assertTrue(result.getPinned());
         assertEquals(1, result.getEvents().size());
@@ -191,7 +175,6 @@ class CompilationServiceTest {
 
     @Test
     void updateShouldThrowExceptionWhenTitleExists() {
-        // Arrange
         Compilation existingCompilation = createTestCompilation(1L, "Old Title", false, null);
         Compilation anotherCompilation = createTestCompilation(2L, "Existing Title", true, null);
 
@@ -201,13 +184,11 @@ class CompilationServiceTest {
         when(compilationRepository.findById(1L)).thenReturn(Optional.of(existingCompilation));
         when(compilationRepository.findByTitleIgnoreCase("Existing Title")).thenReturn(List.of(anotherCompilation));
 
-        // Act & Assert
         assertThrows(ConditionsNotMetException.class, () -> compilationService.update(1L, updateRequest));
     }
 
     @Test
     void updateShouldNotThrowExceptionWhenTitleSame() {
-        // Arrange
         Compilation existingCompilation = createTestCompilation(1L, "Same Title", false, null);
 
         UpdateCompilationRequest updateRequest = new UpdateCompilationRequest();
@@ -217,31 +198,25 @@ class CompilationServiceTest {
         when(compilationRepository.findByTitleIgnoreCase("Same Title")).thenReturn(List.of(existingCompilation));
         when(compilationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act & Assert
         assertDoesNotThrow(() -> compilationService.update(1L, updateRequest));
     }
 
     @Test
     void deleteShouldDeleteCompilation() {
-        // Arrange
         Compilation compilation = createTestCompilation(1L, "To Delete", false, null);
 
         when(compilationRepository.findById(1L)).thenReturn(Optional.of(compilation));
         doNothing().when(compilationRepository).deleteById(1L);
 
-        // Act
         compilationService.delete(1L);
 
-        // Assert
         verify(compilationRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void deleteShouldThrowNotFoundExceptionWhenNotExists() {
-        // Arrange
         when(compilationRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(NotFoundException.class, () -> compilationService.delete(1L));
         verify(compilationRepository, never()).deleteById(any());
     }

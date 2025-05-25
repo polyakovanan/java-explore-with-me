@@ -140,14 +140,11 @@ class CategoryIntegrationTest {
 
     @Test
     void deleteCategoryWithEvents_shouldReturnConflict() throws Exception {
-        // Создаем и сохраняем пользователя (инициатора события)
         User initiator = new User();
         initiator.setName("Инициатор");
         initiator.setEmail("initiator@example.com");
-        // Предполагаем, что у вас есть UserRepository
         User savedInitiator = userRepository.save(initiator);
 
-        // Создаем событие, связанное с категорией
         Event event = new Event();
         event.setAnnotation("Тестовое описание события");
         event.setCategory(existingCategory);
@@ -164,14 +161,12 @@ class CategoryIntegrationTest {
         event.setCreatedOn(LocalDateTime.now());
         eventRepository.save(event);
 
-        // Пытаемся удалить категорию, связанную с событием
         mockMvc.perform(delete("/admin/categories/{id}", existingCategory.getId()))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value(
                         "Удаление категории невозможно, так как она используется в событиях"
                 ));
 
-        // Проверяем, что категория осталась в базе
         assertTrue(categoryRepository.findById(existingCategory.getId()).isPresent());
     }
 }

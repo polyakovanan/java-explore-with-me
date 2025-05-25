@@ -55,13 +55,10 @@ class CategoryServiceTest {
 
     @Test
     void getAllShouldReturnListOfCategories() {
-        // Arrange
         when(categoryRepository.findCategories(0, 10)).thenReturn(List.of(category));
 
-        // Act
         List<CategoryDto> result = categoryService.getAll(0, 10);
 
-        // Assert
         assertEquals(1, result.size());
         assertEquals(categoryDto.getId(), result.getFirst().getId());
         assertEquals(categoryDto.getName(), result.getFirst().getName());
@@ -70,13 +67,10 @@ class CategoryServiceTest {
 
     @Test
     void getByIdWhenExistsShouldReturnCategory() {
-        // Arrange
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
-        // Act
         CategoryDto result = categoryService.getById(1L);
 
-        // Assert
         assertEquals(categoryDto.getId(), result.getId());
         assertEquals(categoryDto.getName(), result.getName());
         verify(categoryRepository).findById(1L);
@@ -84,10 +78,8 @@ class CategoryServiceTest {
 
     @Test
     void getByIdWhenNotExistsShouldThrowNotFoundException() {
-        // Arrange
         when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> categoryService.getById(999L)
@@ -98,14 +90,11 @@ class CategoryServiceTest {
 
     @Test
     void createWhenValidShouldReturnCreatedCategory() {
-        // Arrange
         when(categoryRepository.findByNameIgnoreCase("Концерты")).thenReturn(List.of());
         when(categoryRepository.saveAndFlush(any(Category.class))).thenReturn(category);
 
-        // Act
         CategoryDto result = categoryService.create(newCategoryDto);
 
-        // Assert
         assertEquals(categoryDto.getId(), result.getId());
         assertEquals(categoryDto.getName(), result.getName());
         verify(categoryRepository).findByNameIgnoreCase("Концерты");
@@ -114,10 +103,8 @@ class CategoryServiceTest {
 
     @Test
     void createWhenNameExistsShouldThrowConditionsNotMetException() {
-        // Arrange
         when(categoryRepository.findByNameIgnoreCase("Концерты")).thenReturn(List.of(category));
 
-        // Act & Assert
         ConditionsNotMetException exception = assertThrows(
                 ConditionsNotMetException.class,
                 () -> categoryService.create(newCategoryDto)
@@ -129,7 +116,6 @@ class CategoryServiceTest {
 
     @Test
     void updateWhenValidShouldReturnUpdatedCategory() {
-        // Arrange
         Category updatedCategory = new Category();
         updatedCategory.setId(1L);
         updatedCategory.setName("Обновленные концерты");
@@ -141,10 +127,8 @@ class CategoryServiceTest {
         NewCategoryDto updateDto = new NewCategoryDto();
         updateDto.setName("Обновленные концерты");
 
-        // Act
         CategoryDto result = categoryService.update(1L, updateDto);
 
-        // Assert
         assertEquals(1L, result.getId());
         assertEquals("Обновленные концерты", result.getName());
         verify(categoryRepository).findById(1L);
@@ -154,10 +138,8 @@ class CategoryServiceTest {
 
     @Test
     void updateWhenCategoryNotExistsShouldThrowNotFoundException() {
-        // Arrange
         when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> categoryService.update(999L, newCategoryDto)
@@ -169,7 +151,6 @@ class CategoryServiceTest {
 
     @Test
     void updateWhenNameExistsForOtherCategoryShouldThrowConditionsNotMetException() {
-        // Arrange
         Category otherCategory = new Category();
         otherCategory.setId(2L);
         otherCategory.setName("Концерты");
@@ -177,7 +158,6 @@ class CategoryServiceTest {
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(categoryRepository.findByNameIgnoreCase("Концерты")).thenReturn(List.of(otherCategory));
 
-        // Act & Assert
         ConditionsNotMetException exception = assertThrows(
                 ConditionsNotMetException.class,
                 () -> categoryService.update(1L, newCategoryDto)
@@ -190,14 +170,11 @@ class CategoryServiceTest {
 
     @Test
     void deleteWhenValidShouldDeleteCategory() {
-        // Arrange
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(eventRepository.findAllByCategoryId(1L)).thenReturn(List.of());
 
-        // Act
         categoryService.delete(1L);
 
-        // Assert
         verify(categoryRepository).findById(1L);
         verify(eventRepository).findAllByCategoryId(1L);
         verify(categoryRepository).deleteById(1L);
@@ -205,10 +182,8 @@ class CategoryServiceTest {
 
     @Test
     void deleteWhenCategoryNotExistsShouldThrowNotFoundException() {
-        // Arrange
         when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> categoryService.delete(999L)
@@ -220,11 +195,9 @@ class CategoryServiceTest {
 
     @Test
     void deleteWhenCategoryHasEventsShouldThrowConditionsNotMetException() {
-        // Arrange
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(eventRepository.findAllByCategoryId(1L)).thenReturn(List.of(new Event()));
 
-        // Act & Assert
         ConditionsNotMetException exception = assertThrows(
                 ConditionsNotMetException.class,
                 () -> categoryService.delete(1L)

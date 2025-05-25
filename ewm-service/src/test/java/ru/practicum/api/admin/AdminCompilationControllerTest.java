@@ -37,7 +37,6 @@ class AdminCompilationControllerTest {
 
     @Test
     void createShouldReturnCreatedCompilation() throws Exception {
-        // Arrange
         NewCompilationDto newCompilationDto = new NewCompilationDto();
         newCompilationDto.setTitle("New Compilation");
         newCompilationDto.setPinned(true);
@@ -52,7 +51,6 @@ class AdminCompilationControllerTest {
         Mockito.when(compilationService.create(any(NewCompilationDto.class)))
                 .thenReturn(expectedDto);
 
-        // Act & Assert
         mockMvc.perform(post("/admin/compilations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCompilationDto)))
@@ -64,12 +62,10 @@ class AdminCompilationControllerTest {
 
     @Test
     void createShouldReturnBadRequestWhenTitleIsBlank() throws Exception {
-        // Arrange
         NewCompilationDto invalidDto = new NewCompilationDto();
         invalidDto.setTitle(" ");
         invalidDto.setPinned(false);
 
-        // Act & Assert
         mockMvc.perform(post("/admin/compilations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
@@ -78,17 +74,14 @@ class AdminCompilationControllerTest {
 
     @Test
     void deleteShouldReturnNoContent() throws Exception {
-        // Arrange
         Mockito.doNothing().when(compilationService).delete(anyLong());
 
-        // Act & Assert
         mockMvc.perform(delete("/admin/compilations/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void updateShouldReturnUpdatedCompilation() throws Exception {
-        // Arrange
         UpdateCompilationRequest updateRequest = new UpdateCompilationRequest();
         updateRequest.setTitle("Updated Title");
         updateRequest.setPinned(true);
@@ -103,7 +96,6 @@ class AdminCompilationControllerTest {
         Mockito.when(compilationService.update(anyLong(), any(UpdateCompilationRequest.class)))
                 .thenReturn(expectedDto);
 
-        // Act & Assert
         mockMvc.perform(patch("/admin/compilations/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
@@ -115,10 +107,9 @@ class AdminCompilationControllerTest {
 
     @Test
     void updateShouldReturnBadRequestWhenEmptyBody() throws Exception {
-        // Act & Assert
         mockMvc.perform(patch("/admin/compilations/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                .andExpect(status().isOk()); // Пустое тело допустимо, так как все поля в UpdateCompilationRequest optional
+                .andExpect(status().isOk());
     }
 }

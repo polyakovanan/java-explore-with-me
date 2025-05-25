@@ -33,7 +33,6 @@ class CommonCompilationControllerTest {
 
     @Test
     void findAllShouldReturnListOfCompilations() throws Exception {
-        // Arrange
         CompilationDto compilationDto = new CompilationDto();
         compilationDto.setId(1L);
         compilationDto.setTitle("Test Compilation");
@@ -43,7 +42,6 @@ class CommonCompilationControllerTest {
         Mockito.when(compilationService.findAll(anyBoolean(), anyInt(), anyInt()))
                 .thenReturn(List.of(compilationDto));
 
-        // Act & Assert
         mockMvc.perform(get("/compilations")
                         .param("pinned", "true")
                         .param("from", "0")
@@ -56,11 +54,9 @@ class CommonCompilationControllerTest {
 
     @Test
     void findAllShouldUseDefaultParameters() throws Exception {
-        // Arrange
         Mockito.when(compilationService.findAll(isNull(), anyInt(), anyInt()))
                 .thenReturn(Collections.emptyList());
 
-        // Act & Assert
         mockMvc.perform(get("/compilations"))
                 .andExpect(status().isOk());
 
@@ -69,11 +65,9 @@ class CommonCompilationControllerTest {
 
     @Test
     void findAllShouldReturnEmptyList() throws Exception {
-        // Arrange
         Mockito.when(compilationService.findAll(anyBoolean(), anyInt(), anyInt()))
                 .thenReturn(Collections.emptyList());
 
-        // Act & Assert
         mockMvc.perform(get("/compilations")
                         .param("pinned", "false"))
                 .andExpect(status().isOk())
@@ -83,7 +77,6 @@ class CommonCompilationControllerTest {
 
     @Test
     void findByIdShouldReturnCompilation() throws Exception {
-        // Arrange
         CompilationDto compilationDto = new CompilationDto();
         compilationDto.setId(1L);
         compilationDto.setTitle("Test Compilation");
@@ -93,7 +86,6 @@ class CommonCompilationControllerTest {
         Mockito.when(compilationService.findById(anyLong()))
                 .thenReturn(compilationDto);
 
-        // Act & Assert
         mockMvc.perform(get("/compilations/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -103,11 +95,9 @@ class CommonCompilationControllerTest {
 
     @Test
     void findByIdShouldReturnNotFoundForInvalidId() throws Exception {
-        // Arrange
         Mockito.when(compilationService.findById(anyLong()))
                 .thenThrow(new ru.practicum.core.exception.NotFoundException("Compilation not found"));
 
-        // Act & Assert
         mockMvc.perform(get("/compilations/999"))
                 .andExpect(status().isNotFound());
     }

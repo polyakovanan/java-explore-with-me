@@ -43,11 +43,9 @@ class CommonCategoryControllerTest {
 
     @Test
     void getAllCategoriesShouldReturnListOfCategories() throws Exception {
-        // Arrange
         List<CategoryDto> categories = List.of(categoryDto);
         when(categoryService.getAll(0, 10)).thenReturn(categories);
 
-        // Act & Assert
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(categoryDto.getId()))
@@ -58,11 +56,9 @@ class CommonCategoryControllerTest {
 
     @Test
     void getAllCategoriesWithPaginationShouldUseParameters() throws Exception {
-        // Arrange
         List<CategoryDto> categories = List.of(categoryDto);
         when(categoryService.getAll(5, 20)).thenReturn(categories);
 
-        // Act & Assert
         mockMvc.perform(get("/categories")
                         .param("from", "5")
                         .param("size", "20"))
@@ -87,10 +83,8 @@ class CommonCategoryControllerTest {
 
     @Test
     void getCategoryByIdShouldReturnCategory() throws Exception {
-        // Arrange
         when(categoryService.getById(1L)).thenReturn(categoryDto);
 
-        // Act & Assert
         mockMvc.perform(get("/categories/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(categoryDto.getId()))
@@ -101,10 +95,8 @@ class CommonCategoryControllerTest {
 
     @Test
     void getCategoryByIdWhenNotExistsShouldReturnNotFound() throws Exception {
-        // Arrange
         when(categoryService.getById(999L)).thenThrow(new NotFoundException("Category not found"));
 
-        // Act & Assert
         mockMvc.perform(get("/categories/{id}", 999L))
                 .andExpect(status().isNotFound());
 

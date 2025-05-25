@@ -146,7 +146,7 @@ class SecuredEventControllerTest {
 
     @Test
     void createWithInvalidDataShouldReturnBadRequest() throws Exception {
-        NewEventDto invalidDto = new NewEventDto(); // Не хватает обязательных полей
+        NewEventDto invalidDto = new NewEventDto();
 
         mockMvc.perform(post("/users/{userId}/events", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +172,7 @@ class SecuredEventControllerTest {
     @Test
     void updateWithInvalidDataShouldReturnBadRequest() throws Exception {
         UpdateEventUserRequest invalidRequest = new UpdateEventUserRequest();
-        invalidRequest.setTitle(""); // Пустой заголовок
+        invalidRequest.setTitle("");
 
         mockMvc.perform(patch("/users/{userId}/events/{eventId}", 1L, 1L)
                         .contentType(MediaType.APPLICATION_JSON)

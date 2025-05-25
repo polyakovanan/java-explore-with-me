@@ -110,7 +110,7 @@ class EventServiceTest {
         List<EventShortDto> result = eventService.findByUserId(1L, 0, 10);
 
         assertEquals(1, result.size());
-        assertEquals(event.getTitle(), result.get(0).getTitle());
+        assertEquals(event.getTitle(), result.getFirst().getTitle());
         verify(eventRepository).findAllByInitiatorId(1L, 0, 10);
     }
 
@@ -152,7 +152,7 @@ class EventServiceTest {
         List<EventShortDto> result = eventService.searchCommon(search);
 
         assertEquals(1, result.size());
-        assertEquals(event.getTitle(), result.get(0).getTitle());
+        assertEquals(event.getTitle(), result.getFirst().getTitle());
         verify(eventRepository).findCommonEventsByFilters(search);
     }
 
@@ -174,7 +174,7 @@ class EventServiceTest {
         List<EventFullDto> result = eventService.searchAdmin(search);
 
         assertEquals(1, result.size());
-        assertEquals(event.getTitle(), result.get(0).getTitle());
+        assertEquals(event.getTitle(), result.getFirst().getTitle());
         verify(eventRepository).findAdminEventsByFilters(search);
     }
 

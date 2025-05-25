@@ -58,13 +58,11 @@ class CompilationIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Очистка данных перед каждым тестом
         compilationRepository.deleteAll();
         eventRepository.deleteAll();
         categoryRepository.deleteAll();
         userRepository.deleteAll();
 
-        // Создание тестовых данных
         Category category = categoryRepository.save(new Category(null, "Test Category"));
         User user = userRepository.save(new User(null, "Test User", "test@email.com"));
         testEvent = eventRepository.save(Event.builder()
@@ -86,7 +84,6 @@ class CompilationIntegrationTest {
 
     @Test
     void shouldCreateGetAndDeleteCompilation() throws Exception {
-        // 1. Создание подборки через Admin API
         NewCompilationDto newCompilation = new NewCompilationDto();
         newCompilation.setTitle("New Compilation");
         newCompilation.setPinned(true);
@@ -101,27 +98,23 @@ class CompilationIntegrationTest {
                 .andExpect(jsonPath("$.pinned", is(true)))
                 .andExpect(jsonPath("$.events[0].id", is(testEvent.getId().intValue())));
 
-        // Проверка, что подборка сохранена в БД
         List<Compilation> compilations = compilationRepository.findAll();
         assertEquals(1, compilations.size());
-        assertEquals("New Compilation", compilations.get(0).getTitle());
+        assertEquals("New Compilation", compilations.getFirst().getTitle());
 
-        Long compilationId = compilations.get(0).getId();
+        Long compilationId = compilations.getFirst().getId();
 
-        // 2. Получение подборки через Public API
         mockMvc.perform(get("/compilations/{compId}", compilationId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(compilationId.intValue())))
                 .andExpect(jsonPath("$.title", is("New Compilation")));
 
-        // 3. Получение списка подборок через Public API
         mockMvc.perform(get("/compilations")
                         .param("pinned", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(compilationId.intValue())));
 
-        // 4. Обновление подборки через Admin API
         UpdateCompilationRequest updateRequest = new UpdateCompilationRequest();
         updateRequest.setTitle("Updated Compilation");
         updateRequest.setPinned(false);
@@ -133,17 +126,14 @@ class CompilationIntegrationTest {
                 .andExpect(jsonPath("$.title", is("Updated Compilation")))
                 .andExpect(jsonPath("$.pinned", is(false)));
 
-        // 5. Удаление подборки через Admin API
         mockMvc.perform(delete("/admin/compilations/{compId}", compilationId))
                 .andExpect(status().isNoContent());
 
-        // Проверка, что подборка удалена из БД
         assertEquals(0, compilationRepository.count());
     }
 
     @Test
     void shouldNotCreateCompilationWithDuplicateTitle() throws Exception {
-        // Создаем первую подборку
         NewCompilationDto firstCompilation = new NewCompilationDto();
         firstCompilation.setTitle("Duplicate Title");
         firstCompilation.setPinned(false);
@@ -153,7 +143,6 @@ class CompilationIntegrationTest {
                         .content(objectMapper.writeValueAsString(firstCompilation)))
                 .andExpect(status().isCreated());
 
-        // Пытаемся создать подборку с таким же названием
         NewCompilationDto duplicateCompilation = new NewCompilationDto();
         duplicateCompilation.setTitle("Duplicate Title");
         duplicateCompilation.setPinned(true);

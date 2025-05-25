@@ -45,7 +45,6 @@ class UserIntegrationTest {
 
     @Test
     void createUserShouldSaveToDatabase() throws Exception {
-        // Act & Assert
         mockMvc.perform(post("/admin/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserRequest)))
@@ -54,7 +53,6 @@ class UserIntegrationTest {
                 .andExpect(jsonPath("$.name").value(newUserRequest.getName()))
                 .andExpect(jsonPath("$.email").value(newUserRequest.getEmail()));
 
-        // Verify database
         assertEquals(1, userRepository.count());
         var savedUser = userRepository.findAll().get(0);
         assertEquals(newUserRequest.getName(), savedUser.getName());
@@ -63,10 +61,8 @@ class UserIntegrationTest {
 
     @Test
     void getAllUsersShouldReturnSavedUsers() throws Exception {
-        // Arrange
         var savedUser = userRepository.save(createTestUser());
 
-        // Act & Assert
         mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(savedUser.getId()))
@@ -76,30 +72,24 @@ class UserIntegrationTest {
 
     @Test
     void deleteUserShouldRemoveFromDatabase() throws Exception {
-        // Arrange
         var savedUser = userRepository.save(createTestUser());
 
-        // Act & Assert
         mockMvc.perform(delete("/admin/users/{userId}", savedUser.getId()))
                 .andExpect(status().isNoContent());
 
-        // Verify database
         assertFalse(userRepository.existsById(savedUser.getId()));
     }
 
     @Test
     void deleteNonExistentUserShouldReturnNotFound() throws Exception {
-        // Act & Assert
         mockMvc.perform(delete("/admin/users/{userId}", 999L))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void createUserWithExistingEmailShouldReturnConflict() throws Exception {
-        // Arrange
         userRepository.save(createTestUser());
 
-        // Act & Assert
         mockMvc.perform(post("/admin/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserRequest)))
