@@ -21,9 +21,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "OR LOWER(e.title) LIKE LOWER(CONCAT('%', :text, '%'))) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (:categories IS NULL OR e.category.id IN :categories) " +
-            "AND ((COALESCE(:rangeStart, NULL) IS NULL AND COALESCE(:rangeEnd, NULL) IS NULL AND e.eventDate > :currentTime) " +
-            "OR (COALESCE(:rangeStart, NULL) IS NOT NULL AND e.eventDate >= :rangeStart) " +
-            "OR (COALESCE(:rangeEnd, NULL) IS NOT NULL AND e.eventDate <= :rangeEnd)) " +
+            "AND ((CAST(:rangeStart as DATE) IS NULL AND CAST(:rangeEnd as DATE) IS NULL AND e.eventDate > :currentTime) " +
+            "OR (CAST(:rangeStart as DATE) IS NOT NULL AND e.eventDate >= :rangeStart) " +
+            "OR (CAST(:rangeEnd as DATE) IS NOT NULL AND e.eventDate <= :rangeEnd)) " +
             "AND (:onlyAvailable IS NULL OR " +
             "     (:onlyAvailable = TRUE AND (e.participantLimit = 0 OR e.participantLimit > e.confirmedRequests)) " +
             "     OR :onlyAvailable = FALSE) " +
@@ -67,8 +67,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE (:users IS NULL OR e.initiator.id IN :users) " +
             "AND (:states IS NULL OR e.state IN :states) " +
             "AND (:categories IS NULL OR e.category.id IN :categories) " +
-            "AND (COALESCE(:rangeStart, NULL) IS NULL OR e.eventDate >= :rangeStart) " +
-            "AND (COALESCE(:rangeEnd, NULL) IS NULL OR e.eventDate <= :rangeEnd) " +
+            "AND (CAST(:rangeStart as DATE) IS NULL OR e.eventDate >= :rangeStart) " +
+            "AND (CAST(:rangeEnd as DATE) IS NULL OR e.eventDate <= :rangeEnd) " +
             "ORDER BY e.eventDate DESC")
     List<Event> findAdminEventsByFilters(
             @Param("users") List<Long> users,
