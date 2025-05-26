@@ -14,6 +14,7 @@ import ru.practicum.core.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @RestControllerAdvice
@@ -23,7 +24,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(final NotFoundException e) {
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.NOT_FOUND.toString())
                 .reason("Запрошенный объект не найден.")
                 .message(e.getMessage())
@@ -35,7 +36,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConditionsNotMet(final ConditionsNotMetException e) {
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.CONFLICT.toString())
                 .reason("Нарушены условия целостности данных.")
                 .message(e.getMessage())
@@ -50,7 +51,7 @@ public class ErrorHandler {
         String field = Objects.requireNonNull(e.getBindingResult().getFieldError()).getField();
         String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .reason("Некорректный запрос.")
                 .message("Некорректное значение параметра " + field + ": " + errorMessage)
@@ -62,7 +63,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleСonstraintViolationException(final ConstraintViolationException e) {
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .reason("Нарушены условия валидации данных.")
                 .message(e.getMessage())
@@ -74,7 +75,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMessageNotReadableException(final HttpMessageNotReadableException e) {
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .reason("Некорректно составлен запрос.")
                 .message(e.getMessage())
@@ -86,7 +87,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleMissingRequestParameterException(final MissingServletRequestParameterException e) {
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .reason("Не передан обязательный параметр + " + e.getParameterName() + ".")
                 .message(e.getMessage())
@@ -98,7 +99,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleDateValidationException(final DateValidationException e) {
         return ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .reason("Нарушены условия валидации дат.")
                 .message(e.getMessage())
@@ -110,7 +111,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleGeneric(final Throwable e) {
         ApiError apiError = ApiError.builder()
-                .errors(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .errors(List.of(e.getStackTrace()[0].toString()))
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
                 .reason("Внутренняя ошибка сервера.")
                 .timestamp(SimpleDateTimeFormatter.toString(LocalDateTime.now()))
