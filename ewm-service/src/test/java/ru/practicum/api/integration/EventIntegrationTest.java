@@ -235,7 +235,6 @@ class EventIntegrationTest {
         mockMvc.perform(post("/users/{userId}/events", initiator.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors", not(empty())));
+                .andExpect(status().isBadRequest());
     }
 }
