@@ -32,7 +32,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru.practicum.EWMStatsApplication</mainClass>
+                    <mainClass>ru.practicum.server.EWMStatsApplication</mainClass>
                     <layout>JAR</layout>
                 </configuration>
                 <executions>
