@@ -14,7 +14,7 @@ import ru.practicum.core.service.CategoryService;
 
 import java.util.List;
 
-@Service("categoryService")
+@Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 

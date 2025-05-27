@@ -15,18 +15,18 @@ import java.time.LocalDateTime;
 public class ParticipationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @ManyToOne
-    Event event;
+    private Event event;
 
     @ManyToOne
-    User requester;
+    private User requester;
 
     @Column(nullable = false)
-    LocalDateTime created;
+    private LocalDateTime created;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    ParticipationRequestStatus status;
+    private ParticipationRequestStatus status;
 }

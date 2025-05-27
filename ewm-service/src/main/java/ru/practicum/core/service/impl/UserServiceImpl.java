@@ -14,7 +14,7 @@ import ru.practicum.core.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
-@Service("userService")
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;

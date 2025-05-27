@@ -27,7 +27,7 @@ import ru.practicum.dto.StatsDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Service("eventService")
+@Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
