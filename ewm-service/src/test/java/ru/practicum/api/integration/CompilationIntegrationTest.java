@@ -64,7 +64,7 @@ class CompilationIntegrationTest {
         userRepository.deleteAll();
 
         Category category = categoryRepository.save(new Category(null, "Test Category"));
-        User user = userRepository.save(new User(null, "Test User", "test@email.com"));
+        User user = userRepository.save(new User(null, "Test User", "test@email.com", 0L));
         testEvent = eventRepository.save(Event.builder()
                 .title("Test Event")
                 .annotation("Test Annotation")
