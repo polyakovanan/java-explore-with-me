@@ -107,6 +107,19 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         return findAllByInitiatorId(userId, Pageable.unpaged());
     }
 
+    @Query("SELECT e FROM events e " +
+            "WHERE e.initiator.id IN :user " +
+            "AND e.state = :state " +
+            "ORDER BY e.eventDate DESC")
+    List<Event> findAllByInitiatorIdIn(@Param("user")List<Long> userId, @Param("state") EventState state, Pageable pageable);
+
+    default List<Event> findAllByInitiatorIdIn(List<Long> userId, Integer from, Integer size) {
+        if (from != null && size != null) {
+            return findAllByInitiatorIdIn(userId, EventState.PUBLISHED, Pageable.ofSize(size).withPage(from / size));
+        }
+        return findAllByInitiatorIdIn(userId, EventState.PUBLISHED, Pageable.unpaged());
+    }
+
     List<Event> findAllByCategoryId(Long categoryId);
 
     List<Event> findAllByIdIn(List<Long> list);
