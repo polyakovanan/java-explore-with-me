@@ -10,7 +10,9 @@ import ru.practicum.core.persistance.model.dto.event.EventShortDto;
 import ru.practicum.core.persistance.model.dto.user.UserShortDto;
 import ru.practicum.core.service.SubscriptionService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,24 +36,24 @@ public class SecuredSubscriptionController {
     }
 
     @PostMapping("/{initiatorId}")
-    public ResponseEntity<Void> subscribe(@PathVariable Long userId, @PathVariable Long initiatorId) {
+    public ResponseEntity<Map<String, Object>> subscribe(@PathVariable Long userId, @PathVariable Long initiatorId) {
         subscriptionService.subscribe(userId, initiatorId);
         log.info("Получен запрос POST /users/{}/subscriptions/{}", userId, initiatorId);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(Collections.emptyMap(), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{initiatorId}/cancel")
-    public ResponseEntity<Void> cancel(@PathVariable Long userId, @PathVariable Long initiatorId) {
+    public ResponseEntity<Map<String, Object>> cancel(@PathVariable Long userId, @PathVariable Long initiatorId) {
         subscriptionService.unsubscribe(userId, initiatorId);
         log.info("Получен запрос PATCH /users/{}/subscriptions/{}/cancel", userId, initiatorId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(Collections.emptyMap(), HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/{subscriberId}/remove")
-    public ResponseEntity<Void> remove(@PathVariable Long userId, @PathVariable Long subscriberId) {
+    public ResponseEntity<Map<String, Object>> remove(@PathVariable Long userId, @PathVariable Long subscriberId) {
         subscriptionService.remove(userId, subscriberId);
         log.info("Получен запрос PATCH /users/{}/subscriptions/{}/remove", userId, subscriberId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(Collections.emptyMap(), HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/events")
